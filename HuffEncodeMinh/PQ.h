@@ -217,7 +217,7 @@ pq_data_t pq_dequeue(pq_t queue, pq_status_t *status);
 // Returns the number of entries stored in <queue>,  returns  zero  if NULL is
 // passed in for <queue>.
 
-inline pq_counter_t pq_number_of_entries(pq_t queue);
+extern inline pq_counter_t pq_number_of_entries(pq_t queue);
 
 
 // ---------------------------------------------------------------------------
