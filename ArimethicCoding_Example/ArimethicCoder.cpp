@@ -1,10 +1,3 @@
-/*
- * ArimethicCoder.cpp
- *
- *  Created on: Dec 4, 2020
- *      Author: minh
- */
-
 #include "ArithmeticCoder.h"
 #include "Tool.h"
 // constants to split the number space of 32 bit integers
@@ -16,8 +9,7 @@ ArithmeticCoderC::ArithmeticCoderC() {
 	mBitCount = 0;
 	mBitBuffer = 0;
 	mLow = 0;
-	mHigh = 0x7FFFFFFF;
-// just work with least significant 31 bits
+	mHigh = 0x7FFFFFFF; // just work with least significant 31 bits
 	mScale = 0;
 	mBuffer = 0;
 	mStep = 0;
@@ -26,22 +18,22 @@ void ArithmeticCoderC::SetFile(fstream *file) {
 	mFile = file;
 }
 void ArithmeticCoderC::SetBit(const unsigned char bit) {
-	// add bit to the buffer
+// add bit to the buffer
 	mBitBuffer = (mBitBuffer << 1) | bit;
 	mBitCount++;
-	if (mBitCount == 8)
-	// buffer full
-			{ // write
+	if (mBitCount == 8) // buffer full
+			{
+// write
 		mFile->write(reinterpret_cast<char*>(&mBitBuffer), sizeof(mBitBuffer));
+
 		mBitCount = 0;
 	}
 }
-
-void ArithmeticCoderC::SetBitFlush() { // fill buffer with 0 up to the next byte
+void ArithmeticCoderC::SetBitFlush() {
+// fill buffer with 0 up to the next byte
 	while (mBitCount != 0)
 		SetBit(0);
 }
-
 unsigned char ArithmeticCoderC::GetBit() {
 	if (mBitCount == 0) // buffer empty
 			{
@@ -51,41 +43,42 @@ unsigned char ArithmeticCoderC::GetBit() {
 		else
 			mBitBuffer = 0; // append zeros
 		mBitCount = 8;
-	} // extract bit from buffer
+	}
+// extract bit from buffer
 	unsigned char bit = mBitBuffer >> 7;
 	mBitBuffer <<= 1;
 	mBitCount--;
 	return bit;
-
 }
-
 void ArithmeticCoderC::Encode(const unsigned int low_count,
 		const unsigned int high_count, const unsigned int total)
 // total < 2ˆ29
-		{ // partition number space into single steps
-	mStep = (mHigh - mLow + 1) / total;
-	// interval open at the top =>+1
-	// update upper bound
-	mHigh = mLow + mStep * high_count - 1;
-	// interval open at the top => -1
-	// update lower bound
-	mLow = mLow + mStep * low_count;	// apply e1/e2 scaling
+		{
+// partition number space into single steps
+	mStep = (mHigh - mLow + 1) / total; // interval open at the top => +1
+// update upper bound
+	mHigh = mLow + mStep * high_count - 1; // interval open at the top => -1
+// update lower bound
+	mLow = mLow + mStep * low_count;
+// apply e1/e2 scaling
 	while ((mHigh < g_Half) || (mLow >= g_Half)) {
 		if (mHigh < g_Half) {
 			SetBit(0);
 			mLow = mLow * 2;
-			mHigh = mHigh * 2 + 1;	// perform e3 scalings
+			mHigh = mHigh * 2 + 1;
+			// perform e3 scalings
 			for (; mScale > 0; mScale--)
 				SetBit(1);
 		} else if (mLow >= g_Half) {
 			SetBit(1);
 			mLow = 2 * (mLow - g_Half);
-			mHigh = 2 * (mHigh - g_Half) + 1;	// perform e3 scalings
+			mHigh = 2 * (mHigh - g_Half) + 1;
+			// perform e3 scalings
 			for (; mScale > 0; mScale--)
 				SetBit(0);
 		}
 	}
-
+	// e3
 	while ((g_FirstQuarter <= mLow) && (mHigh < g_ThirdQuarter)) {
 		// keep necessary e3 scalings in mind
 		mScale++;
@@ -93,10 +86,9 @@ void ArithmeticCoderC::Encode(const unsigned int low_count,
 		mHigh = 2 * (mHigh - g_FirstQuarter) + 1;
 	}
 }
-
 void ArithmeticCoderC::EncodeFinish() {
-// There are two possibilities of how mLow and mHigh can be distributed,
-// which means that two bits are enough to distinguish them.
+	// There are two possibilities of how mLow and mHigh can be distributed,
+	// which means that two bits are enough to distinguish them.
 	if (mLow < g_FirstQuarter) // mLow < FirstQuarter < Half <= mHigh
 			{
 		SetBit(0);
@@ -109,27 +101,26 @@ void ArithmeticCoderC::EncodeFinish() {
 	// empty the output buffer
 	SetBitFlush();
 }
-
 void ArithmeticCoderC::DecodeStart() {
-// Fill buffer with bits from the input stream
+	// Fill buffer with bits from the input stream
 	for (int i = 0; i < 31; i++) // just use the 31 least significant bits
 		mBuffer = (mBuffer << 1) | GetBit();
 }
 unsigned int ArithmeticCoderC::DecodeTarget(const unsigned int total)
 // total < 2ˆ29
 		{
-// split number space into single steps
+	// split number space into single steps
 	mStep = (mHigh - mLow + 1) / total; // interval open at the top => +1
-// return current value
+	// return current value
 	return (mBuffer - mLow) / mStep;
 }
 void ArithmeticCoderC::Decode(const unsigned int low_count,
 		const unsigned int high_count) {
-// update upper bound
+	// update upper bound
 	mHigh = mLow + mStep * high_count - 1; // interval open at the top => -1
-// update lower bound
+	// update lower bound
 	mLow = mLow + mStep * low_count;
-// e1/e2 scaling
+	// e1/e2 scaling
 	while ((mHigh < g_Half) || (mLow >= g_Half)) {
 		if (mHigh < g_Half) {
 			mLow = mLow * 2;
@@ -150,5 +141,4 @@ void ArithmeticCoderC::Decode(const unsigned int low_count,
 		mBuffer = 2 * (mBuffer - g_FirstQuarter) + GetBit();
 	}
 }
-
 

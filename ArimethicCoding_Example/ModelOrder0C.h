@@ -15,7 +15,7 @@ public:
 protected:
 	void Encode();
 	void Decode();
-	unsigned int mCumCount[257];
+	unsigned int mCumCount[256];
 	unsigned int mTotal;
 };
 

@@ -15,7 +15,9 @@ class ArithmeticCoderC{
 	public:ArithmeticCoderC();
 	void SetFile( fstream *file );
 	void Encode( const unsigned int low_count,const unsigned int high_count,const unsigned int total );
-	void EncodeFinish();void DecodeStart();unsigned int DecodeTarget( const unsigned int total );
+	void EncodeFinish();
+	void DecodeStart();
+	unsigned int DecodeTarget( const unsigned int total );
 	void Decode( const unsigned int low_count,const unsigned int high_count );
 	protected:// bit operations
 	void SetBit( const unsigned char bit );

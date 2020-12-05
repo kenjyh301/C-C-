@@ -12,20 +12,21 @@ using namespace std;
 // signature: "ACMC" (0x434D4341, intel byte order)
 // (magic number for recognition of encoded files)
 const int g_Signature = 0x434D4341;
+
 int  main(int argc, char *argv[])
 {
 	cout << "Arithmetic Coding" << endl;
-	if( argc != 3 )
-	{
-		cout << "Syntax: AC source target" << endl;
-		return 1;
-	}
+//	if( argc != 3 )
+//	{
+//		cout << "Syntax: AC source target" << endl;
+//		return 1;
+//	}
 	fstream source, target;
 	ModelI* model;
 // choose model, here just order-0
-	model = new ModelOrder0C;
-	source.open( argv[1], ios::in | ios::binary );
-	target.open( argv[2], ios::out | ios::binary );
+	model = new ModelOrder0C();
+	source.open( "in.bat", ios::in | ios::binary );
+	target.open( "out.bat", ios::out | ios::binary );
 	if( !source.is_open() )
 	{
 		cout << "Cannot open input stream";
@@ -40,12 +41,12 @@ int  main(int argc, char *argv[])
 	source.read(reinterpret_cast<char*>(&signature),sizeof(signature));
 	if( signature == g_Signature )
 	{
-		cout << "Decoding " << argv[1] << " to " << argv[2] << endl;
+		cout << "Decoding " << "in.bat" << " to " << "out.bat" << endl;
 		model->Process( &source, &target, MODE_DECODE );
 	}
 	else
 	{
-		cout << "Encoding " << argv[1] << " to " << argv[2] << endl;
+		cout << "Encoding " << "in.bat" << " to " << "out.bat" << endl;
 		source.seekg( 0, ios::beg );
 		target.write( reinterpret_cast<const char*>(&g_Signature),
 				sizeof(g_Signature) );
