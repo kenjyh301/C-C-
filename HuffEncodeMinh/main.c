@@ -9,6 +9,7 @@
 #include <stdint.h>
 
 #include "HuffLib.h"
+#include "pqueue.h"
 
 void initFreq() {
 	FILE *f;
@@ -40,8 +41,27 @@ void initFreq() {
 	}
 }
 
+
+//abababcdca --4a 3b 2c 1d
+void testCase(){
+	memset(freq, 0, 256 * 2);
+	freq['a']=4;
+	freq['b']=3;
+	freq['c']=2;
+	freq['d']=1;
+	mBuildTree(0);
+	createMap();
+	printf("%d  %d  %d  %d\n", mapping['a'].code, mapping['b'].code,
+			mapping['c'].code, mapping['d'].code);
+	printf("%d  %d  %d  %d\n", mapping['a'].size, mapping['b'].size,
+				mapping['c'].size, mapping['d'].size);
+}
+
+
 int main() {
-	initFreq();
+	testCase();
+	uint8_t* output;
+	mEncode((char*)"abababcdca", output, 10);
 	return 0;
 }
 

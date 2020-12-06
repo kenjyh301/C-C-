@@ -374,6 +374,11 @@ pq_data_t pq_dequeue(pq_t queue, pq_status_t *status) {
     
     // remember this index
     high_prio_index = index;
+
+
+//    this_entry = this_queue->heap[high_prio_index];
+
+
     index++;
     
     // find heap with highest priority root
@@ -400,6 +405,7 @@ pq_data_t pq_dequeue(pq_t queue, pq_status_t *status) {
     // adjust counters
     this_queue->entry_count--;
     
+    this_entry = this_queue->heap[high_prio_index];
     return this_entry;
 } // end pq_dequeue
 
