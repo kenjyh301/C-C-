@@ -21,6 +21,7 @@ int decode_size=0;
 int output_size;
 
 extern int Package_index;
+extern uint8_t data[];
 
 typedef struct{
 	char code;
@@ -272,7 +273,11 @@ char* mDecode(uint8_t* input,int sizeInBit,int length){
 		printf("buffer define long than data  %d  %d\n",index,Package_index);
 		return NULL;
 	}
-
+	for(int i=0;i<length;i++){
+		if((uint8_t)answer[i]!=data[i]){
+			printf("Wrong result in value %d\n",i);
+		}
+	}
 	printf("Decode success");
 	return answer;
 }
