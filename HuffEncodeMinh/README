@@ -1,0 +1,5 @@
+decode from high bit to low bit (left to right)
+Example data: abababcdca
+Encode data: 0000 0011 1110 1111 0010 0100
+    SizeInBit: 19:
+    Decode: a->c->d->c...
